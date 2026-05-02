@@ -9,8 +9,7 @@ As seen in [Lifehacker](https://lifehacker.com/tech/change-where-macos-notificat
 ## Installation
 
 ```bash
-brew tap notwadegrimridge/brew
-brew install pingplace --no-quarantine
+brew install notwadegrimridge/brew/pingplace
 ```
 
 ## Usage
