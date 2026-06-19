@@ -28,6 +28,7 @@ private enum AppConstants {
   static let childrenChangedNotification = "AXChildrenChanged"
   static let orderedChildrenAttribute = "AXOrderedChildren"
   static let widgetEditorButtonIdentifier = "widget-editor-button"
+  static let widgetIdentifierPrefix = "widget-local:"
   static let dockPadding: CGFloat = 30
   static let bannerRightPadding: CGFloat = 16
   static let bannerSubroles: Set<String> = [
@@ -298,6 +299,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     } != nil
   }
 
+  private func isDesktopWidget(_ root: AXUIElement) -> Bool {
+    root.firstDescendant { element in
+      element.attribute(kAXIdentifierAttribute, as: String.self)?
+        .hasPrefix(AppConstants.widgetIdentifierPrefix) == true
+    } != nil
+  }
+
   private func summary(for element: AXUIElement) -> String {
     let role = element.attribute(kAXRoleAttribute, as: String.self) ?? "?"
     let subrole = element.attribute(kAXSubroleAttribute, as: String.self) ?? "?"
@@ -306,6 +314,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
   }
 
   private func move(_ window: AXUIElement) {
+    if isDesktopWidget(window) {
+      debug("Skipping desktop widget window")
+      return
+    }
+
     if ncPanelIsOpen(in: window) {
       restoreWindowIfNeeded(window, reason: "Notification Center panel opened")
       debug("Skipping Notification Center panel state")
